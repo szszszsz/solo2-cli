@@ -4,7 +4,7 @@ use serde_json::{from_value, Value};
 use anyhow::anyhow;
 use lpc55::bootloader::Bootloader;
 
-use crate::{Card, smartcard};
+use crate::{Card, smartcard, Uuid};
 use crate::apps::App;
 use crate::apps::admin;
 use crate::device_selection::{Device, prompt_user_to_select_device};
@@ -74,7 +74,7 @@ pub fn download_latest_solokeys_firmware() -> crate::Result<Vec<u8>> {
 // A rather tolerant update function, intended to be used by end users.
 pub fn run_update_procedure (
     sbfile: Option<String>,
-    uuid: Option<[u8; 16]>,
+    uuid: Option<Uuid>,
     _skip_major_prompt: bool,
     update_all: bool,
 ) -> crate::Result<()> {
@@ -97,11 +97,16 @@ pub fn run_update_procedure (
 
     if let Some(uuid) = uuid {
         for device in devices {
-            if device.uuid().unwrap() == u128::from_be_bytes(uuid) {
-                return program_device(device, sbfile)
+            match device.uuid() {
+                Ok(device_uuid) => {
+                    if device_uuid == uuid {
+                        return program_device(device, sbfile)
+                    }
+                }
+                _ => continue,
             }
         }
-        return Err(anyhow!("Cannot find solo2 device with UUID {}", hex::encode(uuid)))
+        return Err(anyhow!("Cannot find solo2 device with UUID {}", uuid.hex()))
     } else if update_all {
         for device in devices {
             program_device(device, sbfile.clone())?;
@@ -120,7 +125,7 @@ pub fn program_device(device: Device, sbfile: Vec<u8>) -> crate::Result<()> {
         },
         Device::Card(card) => {
             let uuid = card.uuid.unwrap();
-            let uuid = lpc55::uuid::Builder::from_bytes(uuid.to_be_bytes()).build();
+            let uuid = lpc55::uuid::Builder::from_bytes(uuid.bytes()).build();
             let mut admin = admin::App { card };
             admin.select().ok();
             let device_version = u32::from_be_bytes(admin.version()?);
