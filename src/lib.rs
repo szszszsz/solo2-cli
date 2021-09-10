@@ -2,7 +2,8 @@
 extern crate log;
 
 pub mod apps;
-pub mod device_selection;
+pub mod device;
+pub use device::Device;
 #[cfg(feature = "dev-pki")]
 pub mod dev_pki;
 pub mod error;
