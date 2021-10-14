@@ -182,7 +182,7 @@ async fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
             if let Some(args) = args.subcommand_matches("store-t1-pubkey") {
                 let pubkey_file = args.value_of("BYTES").unwrap();
                 use core::convert::TryInto;
-                let public_key: [u8; 32] = std::fs::read(pubkey_file)?
+                let public_key: [u8; 64] = std::fs::read(pubkey_file)?
                     .as_slice()
                     .try_into()?;
                 app.store_trussed_t1_intermediate_public_key(public_key)?;
