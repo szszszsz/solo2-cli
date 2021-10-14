@@ -52,7 +52,7 @@ pub trait App: Sized {
 
     fn card(&mut self) -> &mut Card;
 
-    fn connect(uuid: Option<[u8; 16]>) -> Result<Card> {
+    fn connect(uuid: Option<[u8; 16]>, name: Option<&str>) -> Result<Card> {
 
         let mut cards = Card::list(Default::default());
 
@@ -61,7 +61,15 @@ pub trait App: Sized {
         }
 
         if cards.len() > 1 {
-            if let Some(uuid) = uuid {
+            if let Some(name) = name {
+                for card in cards {
+                    if card.reader_name.contains(name) {
+                        return Ok(card);
+                    }
+                }
+                return Err(anyhow::anyhow!("Could not find any Solo 2 device with name {}.", name));
+
+            } else  if let Some(uuid) = uuid {
                 // Just use this one.
                 for card in cards {
                     if let Some(card_uuid) = card.uuid {
@@ -90,7 +98,7 @@ pub trait App: Sized {
 
     }
 
-    fn new(uuid: Option<[u8; 16]>) -> Result<Self>;
+    fn new(uuid: Option<[u8; 16]>, name: Option<&str>) -> Result<Self>;
 
     fn call(&mut self, instruction: u8) -> Result<Vec<u8>> {
         self.card().call(0, instruction, 0x00, 0x00, None)

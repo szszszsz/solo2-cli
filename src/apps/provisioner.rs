@@ -14,9 +14,9 @@ impl super::App for App {
     const RID: &'static [u8] = super::SOLOKEYS_RID;
     const PIX: &'static [u8] = super::PROVISIONER_PIX;
 
-    fn new(uuid: Option<[u8; 16]>) -> Result<Self> {
+    fn new(uuid: Option<[u8; 16]>, name: Option<&str>) -> Result<Self> {
         Ok(Self {
-            card: Self::connect(uuid)?,
+            card: Self::connect(uuid, name)?,
         })
     }
 

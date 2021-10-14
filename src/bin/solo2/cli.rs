@@ -28,6 +28,12 @@ pub fn cli() -> clap::App<'static, 'static> {
                 .help("Specify a 16 byte UUID for a Solo 2 / Trussed compatible device to connect to.")
                 .value_name("UUID")
         )
+        .arg(Arg::with_name("name")
+                .long("name")
+                .short("n")
+                .help("Specify reader name")
+                .value_name("NAME")
+        )
         // apps
         .subcommand(
             SubCommand::with_name("app")

@@ -5,6 +5,7 @@ mod cli;
 
 // use core::convert::TryFrom;
 
+use std::option::Option::None;
 use anyhow::anyhow;
 use lpc55::bootloader::Bootloader;
 
@@ -39,6 +40,9 @@ async fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
         None
     };
 
+    let name_maybe = args.value_of("name");
+    let name = name_maybe;
+
     if let Some(args) = args.subcommand_matches("app") {
         use solo2::apps::App;
 
@@ -50,7 +54,7 @@ async fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
                 return Ok(());
             }
 
-            let mut app = AdminApp::new(uuid)?;
+            let mut app = AdminApp::new(uuid, name)?;
             let answer_to_select = app.select()?;
             info!("answer to select: {}", &hex::encode(answer_to_select));
 
@@ -79,7 +83,7 @@ async fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
                 return Ok(());
             }
 
-            let mut app = NdefApp::new(uuid)?;
+            let mut app = NdefApp::new(uuid, name)?;
             app.select()?;
 
             if args.subcommand_matches("capabilities").is_some() {
@@ -130,7 +134,7 @@ async fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
                 return Ok(());
             }
 
-            let mut app = App::new(uuid)?;
+            let mut app = App::new(uuid, name)?;
             app.select()?;
         }
 
@@ -142,7 +146,7 @@ async fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
                 return Ok(());
             }
 
-            let mut app = App::new(uuid)?;
+            let mut app = App::new(uuid, name)?;
             app.select()?;
 
             if args.subcommand_matches("generate-ed255-key").is_some() {
@@ -206,7 +210,7 @@ async fn try_main(args: clap::ArgMatches<'_>) -> anyhow::Result<()> {
                 return Ok(());
             }
 
-            let mut app = App::new(uuid)?;
+            let mut app = App::new(uuid, name)?;
             app.select()?;
         }
     }
