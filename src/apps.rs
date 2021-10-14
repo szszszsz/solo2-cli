@@ -60,9 +60,11 @@ pub trait App: Sized {
             return Err(anyhow::anyhow!("Could not find any Solo 2 devices connected."));
         }
 
+        println!("{:?}", cards.len());
         if cards.len() > 1 {
             if let Some(name) = name {
                 for card in cards {
+                    println!("{}",card.reader_name);
                     if card.reader_name.contains(name) {
                         return Ok(card);
                     }
