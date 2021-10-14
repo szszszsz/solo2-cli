@@ -83,7 +83,7 @@ impl App {
             .map(drop)
     }
 
-    pub fn store_trussed_t1_intermediate_public_key(&mut self, public_key: [u8; 32]) -> Result<()> {
+    pub fn store_trussed_t1_intermediate_public_key(&mut self, public_key: [u8; 64]) -> Result<()> {
         self.call_with(Self::STORE_T1_INTERMEDIATE_PUBKEY, &public_key)
             .map(drop)
     }
